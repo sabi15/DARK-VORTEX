@@ -5,263 +5,490 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DARK STAR · Sponsorship Analyzer</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Zen+Kaku+Gothic+New:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #06060e;
-    --bg2: #0c0c1a;
-    --panel: #0f0f1e;
-    --border: #1a1a30;
-    --border2: #252540;
-    --star: #c084fc;
-    --star2: #7c3aed;
-    --gold: #fbbf24;
-    --green: #34d399;
-    --red: #f87171;
-    --blue: #60a5fa;
-    --text: #e2e8f0;
-    --text2: #6b7280;
-    --text3: #9ca3af;
-  }
-
-- { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-background: var(–bg);
-color: var(–text);
-font-family: ‘Inter’, sans-serif;
-min-height: 100vh;
-padding: 0 0 80px;
-overflow-x: hidden;
+:root {
+  --ocean0: #020b18;
+  --ocean1: #051828;
+  --ocean2: #072035;
+  --ocean3: #0a3050;
+  --water: #1a6b9a;
+  --foam: #5bb8d4;
+  --ice: #a8dff0;
+  --white: #e8f6ff;
+  --gold: #f0c844;
+  --green: #3dffc0;
+  --red: #ff5f7a;
+  --purple: #b09fff;
+  --text: #cceeff;
+  --text2: #5a9ab5;
+  --panel: rgba(5,24,40,0.85);
+  --border: rgba(91,184,212,0.15);
+  --border2: rgba(91,184,212,0.3);
 }
 
-/* STAR FIELD */
-.starfield {
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body {
+background: var(–ocean0);
+color: var(–text);
+font-family: ‘Share Tech Mono’, monospace;
+min-height: 100vh;
+overflow-x: hidden;
+cursor: none;
+}
+
+/* ── CUSTOM CURSOR ── */
+#cursor {
+position: fixed;
+width: 12px; height: 12px;
+border-radius: 50%;
+background: var(–foam);
+pointer-events: none;
+z-index: 9999;
+transform: translate(-50%,-50%);
+transition: transform 0.1s, opacity 0.2s;
+box-shadow: 0 0 12px var(–foam), 0 0 24px rgba(91,184,212,0.4);
+mix-blend-mode: screen;
+}
+#cursor-ring {
+position: fixed;
+width: 32px; height: 32px;
+border-radius: 50%;
+border: 1px solid rgba(91,184,212,0.5);
+pointer-events: none;
+z-index: 9998;
+transform: translate(-50%,-50%);
+transition: all 0.15s ease;
+}
+
+/* ── OCEAN BACKGROUND ── */
+.ocean-bg {
 position: fixed;
 inset: 0;
 z-index: 0;
-pointer-events: none;
+background:
+radial-gradient(ellipse 80% 60% at 20% 80%, rgba(10,48,80,0.8) 0%, transparent 60%),
+radial-gradient(ellipse 60% 40% at 80% 20%, rgba(26,107,154,0.3) 0%, transparent 50%),
+linear-gradient(180deg, #020b18 0%, #051828 40%, #072035 70%, #0a3050 100%);
 overflow: hidden;
 }
-.star-dot {
+
+/* Caustic light rays */
+.ray {
+position: absolute;
+top: -20%;
+width: 2px;
+height: 140%;
+background: linear-gradient(180deg, transparent, rgba(168,223,240,0.06) 30%, rgba(91,184,212,0.08) 50%, rgba(168,223,240,0.04) 70%, transparent);
+transform-origin: top center;
+animation: raySwing var(–rd) ease-in-out infinite alternate;
+filter: blur(1px);
+}
+@keyframes raySwing {
+from { transform: rotate(var(–ra)) scaleX(1); opacity: 0.5; }
+to   { transform: rotate(calc(var(–ra) + var(–rb))) scaleX(1.5); opacity: 1; }
+}
+
+/* Bubbles */
+.bubble {
 position: absolute;
 border-radius: 50%;
-background: white;
-animation: twinkle var(–dur) ease-in-out infinite alternate;
+border: 1px solid rgba(168,223,240,0.3);
+background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.15), transparent 60%);
+animation: bubbleRise var(–bd) ease-in infinite;
+animation-delay: var(–bdelay);
+bottom: -60px;
 }
-@keyframes twinkle {
-from { opacity: 0.1; transform: scale(1); }
-to { opacity: var(–op); transform: scale(1.4); }
+@keyframes bubbleRise {
+0%   { transform: translateX(0) translateY(0) scale(1); opacity: 0; }
+10%  { opacity: 0.7; }
+90%  { opacity: 0.4; }
+100% { transform: translateX(var(–bx)) translateY(-110vh) scale(var(–bs)); opacity: 0; }
 }
 
-.wrap { position: relative; z-index: 1; padding: 0 16px; }
+/* Fish */
+.fish {
+position: absolute;
+font-size: var(–fs);
+animation: fishSwim var(–fd) linear infinite;
+animation-delay: var(–fdelay);
+filter: drop-shadow(0 0 6px rgba(168,223,240,0.4));
+opacity: 0.55;
+}
+@keyframes fishSwim {
+0%   { transform: translateX(-120px) translateY(var(–fy)) scaleX(1); opacity: 0; }
+5%   { opacity: 0.55; }
+95%  { opacity: 0.55; }
+100% { transform: translateX(calc(100vw + 120px)) translateY(var(–fy2)) scaleX(1); opacity: 0; }
+}
 
-/* HERO HEADER */
-.hero {
-text-align: center;
-padding: 40px 16px 32px;
+/* Particles */
+.particle {
+position: absolute;
+border-radius: 50%;
+background: var(–ice);
+animation: particleDrift var(–pd) ease-in-out infinite alternate;
+animation-delay: var(–pdelay);
+}
+@keyframes particleDrift {
+from { transform: translate(0,0) scale(1); opacity: var(–po); }
+to   { transform: translate(var(–px), var(–py)) scale(1.4); opacity: calc(var(–po) * 0.3); }
+}
+
+/* ── LAYOUT ── */
+.app {
 position: relative;
 z-index: 1;
+min-height: 100vh;
+display: flex;
+flex-direction: column;
 }
-.hero-glow {
+
+/* ── HEADER ── */
+header {
+display: flex;
+align-items: center;
+gap: 0;
+padding: 0;
+border-bottom: 1px solid var(–border2);
+background: rgba(2,11,24,0.7);
+backdrop-filter: blur(20px);
+position: sticky;
+top: 0;
+z-index: 100;
+overflow: hidden;
+}
+header::after {
+content: ‘’;
 position: absolute;
-top: 0; left: 50%; transform: translateX(-50%);
-width: 400px; height: 200px;
-background: radial-gradient(ellipse, rgba(192,132,252,0.15) 0%, transparent 70%);
+bottom: 0; left: 0; right: 0;
+height: 1px;
+background: linear-gradient(90deg, transparent, var(–foam), var(–ice), var(–foam), transparent);
+animation: shimmer 3s linear infinite;
+}
+@keyframes shimmer {
+0% { background-position: -200% 0; }
+100% { background-position: 200% 0; }
+}
+
+/* DEV AVATAR PANEL */
+.dev-panel {
+width: 110px;
+min-width: 110px;
+height: 80px;
+position: relative;
+border-right: 1px solid var(–border2);
+flex-shrink: 0;
+overflow: hidden;
+}
+.dev-panel::before {
+content: ‘’;
+position: absolute;
+inset: 0;
+background: linear-gradient(135deg, rgba(26,107,154,0.3), rgba(2,11,24,0.8));
+z-index: 1;
+}
+.dev-img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+object-position: center top;
+filter: saturate(1.2) brightness(0.85);
+animation: devFloat 4s ease-in-out infinite;
+}
+@keyframes devFloat {
+0%,100% { transform: scale(1.05) translateY(0); }
+50%      { transform: scale(1.08) translateY(-3px); }
+}
+.dev-label {
+position: absolute;
+bottom: 6px; left: 0; right: 0;
+text-align: center;
+font-family: ‘Orbitron’, sans-serif;
+font-size: 0.45rem;
+letter-spacing: 2px;
+color: var(–ice);
+z-index: 2;
+text-shadow: 0 0 8px var(–water);
+}
+.dev-glow {
+position: absolute;
+inset: 0;
+z-index: 2;
+background: radial-gradient(ellipse at 50% 100%, rgba(91,184,212,0.25), transparent 70%);
 pointer-events: none;
 }
-.hero-eyebrow {
-font-family: ‘Share Tech Mono’, monospace;
-font-size: 0.62rem;
-letter-spacing: 4px;
-color: var(–star);
-text-transform: uppercase;
-margin-bottom: 10px;
-opacity: 0.8;
+.dev-scan {
+position: absolute;
+left: 0; right: 0;
+height: 2px;
+background: linear-gradient(90deg, transparent, rgba(91,184,212,0.8), transparent);
+z-index: 3;
+animation: scanLine 3s ease-in-out infinite;
 }
-.hero-title {
+@keyframes scanLine {
+0%   { top: 0%; opacity: 0; }
+10%  { opacity: 1; }
+90%  { opacity: 1; }
+100% { top: 100%; opacity: 0; }
+}
+
+/* HEADER TITLE AREA */
+.header-center {
+flex: 1;
+padding: 0 20px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+gap: 3px;
+}
+.header-eyebrow {
+font-size: 0.52rem;
+letter-spacing: 3px;
+color: var(–text2);
+text-transform: uppercase;
+}
+.header-title {
 font-family: ‘Orbitron’, sans-serif;
-font-size: clamp(2.4rem, 10vw, 5rem);
+font-size: 1.6rem;
 font-weight: 900;
 letter-spacing: 6px;
 line-height: 1;
-background: linear-gradient(135deg, #fff 0%, #c084fc 40%, #7c3aed 100%);
+background: linear-gradient(90deg, #fff 0%, var(–ice) 40%, var(–foam) 70%, var(–purple) 100%);
 -webkit-background-clip: text;
 -webkit-text-fill-color: transparent;
 background-clip: text;
-margin-bottom: 6px;
+background-size: 200%;
+animation: titleShift 6s ease-in-out infinite alternate;
 }
-.hero-sub {
-font-family: ‘Share Tech Mono’, monospace;
-font-size: 0.65rem;
+@keyframes titleShift {
+from { background-position: 0%; }
+to   { background-position: 100%; }
+}
+.header-sub {
+font-size: 0.55rem;
+letter-spacing: 2px;
 color: var(–text2);
-letter-spacing: 3px;
-text-transform: uppercase;
-}
-.hero-divider {
-width: 120px;
-height: 1px;
-background: linear-gradient(90deg, transparent, var(–star), transparent);
-margin: 18px auto 0;
 }
 
-/* MODE TOGGLE */
+/* HEADER RIGHT STATS */
+.header-stats {
+display: flex;
+flex-direction: column;
+gap: 4px;
+padding: 12px 16px;
+border-left: 1px solid var(–border);
+}
+.hstat {
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 0.58rem;
+color: var(–text2);
+}
+.hstat-val { color: var(–gold); font-weight: 600; }
+
+/* ── MAIN CONTENT ── */
+main {
+padding: 20px 16px 60px;
+display: flex;
+flex-direction: column;
+gap: 18px;
+animation: fadeUp 0.8s ease both;
+}
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(24px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── MODE TOGGLE ── */
 .mode-toggle {
 display: flex;
 background: var(–panel);
 border: 1px solid var(–border2);
-border-radius: 8px;
-padding: 4px;
-margin: 0 16px 24px;
+border-radius: 10px;
+padding: 5px;
+backdrop-filter: blur(10px);
 position: relative;
-z-index: 1;
+overflow: hidden;
+}
+.mode-toggle::before {
+content: ‘’;
+position: absolute;
+inset: 0;
+background: linear-gradient(135deg, rgba(91,184,212,0.03), transparent);
+pointer-events: none;
 }
 .mode-btn {
 flex: 1;
-padding: 10px 8px;
+padding: 12px 8px;
 border: none;
 background: none;
-cursor: pointer;
-border-radius: 5px;
-transition: all 0.2s;
+cursor: none;
+border-radius: 7px;
+transition: all 0.3s ease;
 text-align: center;
+position: relative;
+overflow: hidden;
 }
+.mode-btn::after {
+content: ‘’;
+position: absolute;
+inset: 0;
+background: linear-gradient(135deg, rgba(91,184,212,0.15), rgba(26,107,154,0.2));
+opacity: 0;
+transition: opacity 0.3s;
+border-radius: 7px;
+}
+.mode-btn.active::after { opacity: 1; }
 .mode-btn.active {
-background: linear-gradient(135deg, var(–star2), #4f1fa0);
-box-shadow: 0 0 20px rgba(124,58,237,0.4);
+border: 1px solid var(–border2);
+box-shadow: 0 0 20px rgba(91,184,212,0.2), inset 0 0 20px rgba(91,184,212,0.05);
 }
-.mode-btn .mode-label {
-font-family: ‘Orbitron’, sans-serif;
-font-size: 0.55rem;
+.mode-btn .ml {
+font-size: 0.52rem;
 letter-spacing: 2px;
 color: var(–text2);
 display: block;
-margin-bottom: 2px;
+margin-bottom: 4px;
+text-transform: uppercase;
 }
-.mode-btn.active .mode-label { color: #ddd; }
-.mode-btn .mode-pct {
+.mode-btn.active .ml { color: var(–ice); }
+.mode-btn .mp {
 font-family: ‘Orbitron’, sans-serif;
-font-size: 1rem;
+font-size: 1.1rem;
 font-weight: 700;
 color: var(–text2);
 display: block;
+margin-bottom: 3px;
 }
-.mode-btn.active .mode-pct { color: white; }
-.mode-btn .mode-desc {
-font-size: 0.58rem;
+.mode-btn.active .mp { color: white; }
+.mode-btn .md {
+font-size: 0.55rem;
 color: var(–text2);
-font-family: ‘Share Tech Mono’, monospace;
 display: block;
-margin-top: 2px;
+line-height: 1.3;
 }
-.mode-btn.active .mode-desc { color: rgba(255,255,255,0.6); }
+.mode-btn.active .md { color: rgba(200,240,255,0.6); }
 
-/* SECTION */
-.section { margin: 0 16px 20px; position: relative; z-index: 1; }
+/* ── PLACEMENT GRID ── */
 .section-label {
-font-family: ‘Share Tech Mono’, monospace;
-font-size: 0.6rem;
+font-size: 0.58rem;
 letter-spacing: 3px;
 color: var(–text2);
 text-transform: uppercase;
 margin-bottom: 10px;
 }
-
-/* PLACEMENT GRID */
 .placement-grid {
 display: grid;
-grid-template-columns: repeat(3, 1fr);
+grid-template-columns: repeat(3,1fr);
 gap: 8px;
 }
 .placement-btn {
 background: var(–panel);
-border: 1px solid var(–border2);
-border-radius: 6px;
-padding: 11px 6px;
-cursor: pointer;
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 12px 6px;
+cursor: none;
 text-align: center;
-transition: all 0.15s ease;
+transition: all 0.25s ease;
 position: relative;
 overflow: hidden;
+backdrop-filter: blur(8px);
 }
 .placement-btn::before {
 content: ‘’;
 position: absolute;
 inset: 0;
-background: linear-gradient(135deg, rgba(192,132,252,0.08), transparent);
+background: radial-gradient(ellipse at 50% 0%, rgba(91,184,212,0.12), transparent 70%);
 opacity: 0;
-transition: opacity 0.15s;
+transition: opacity 0.3s;
 }
-.placement-btn:hover::before { opacity: 1; }
-.placement-btn:hover { border-color: var(–star); }
-.placement-btn.active {
-border-color: var(–star);
-background: rgba(124,58,237,0.15);
-box-shadow: 0 0 16px rgba(192,132,252,0.2), inset 0 0 16px rgba(192,132,252,0.05);
-}
+.placement-btn:hover::before,
 .placement-btn.active::before { opacity: 1; }
+.placement-btn:hover { border-color: var(–foam); transform: translateY(-2px); }
+.placement-btn.active {
+border-color: var(–foam);
+box-shadow: 0 0 20px rgba(91,184,212,0.25), 0 0 40px rgba(91,184,212,0.1);
+transform: translateY(-2px);
+}
 .p-rank {
 font-family: ‘Orbitron’, sans-serif;
-font-size: 1rem;
+font-size: 0.95rem;
 font-weight: 900;
 color: var(–text2);
 display: block;
-margin-bottom: 2px;
+margin-bottom: 3px;
 }
-.placement-btn.active .p-rank { color: var(–star); }
+.placement-btn.active .p-rank { color: var(–ice); }
 .p-label {
-font-family: ‘Share Tech Mono’, monospace;
-font-size: 0.58rem;
+font-size: 0.55rem;
+letter-spacing: 1px;
 color: var(–text2);
 display: block;
 }
-.placement-btn.active .p-label { color: #bbb; }
+.placement-btn.active .p-label { color: var(–foam); }
 
-/* RESULT CARDS */
+/* ── RESULT CARDS ── */
 .result-grid {
 display: grid;
 grid-template-columns: 1fr 1fr;
-gap: 10px;
-margin: 0 16px 12px;
-position: relative; z-index: 1;
+gap: 12px;
 }
 .rcard {
 background: var(–panel);
-border: 1px solid var(–border2);
-border-radius: 8px;
-padding: 14px 12px;
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 16px 14px;
 position: relative;
 overflow: hidden;
+backdrop-filter: blur(12px);
+transition: transform 0.3s, box-shadow 0.3s;
 }
-.rcard::after {
+.rcard:hover { transform: translateY(-3px); }
+.rcard::before {
 content: ‘’;
 position: absolute;
 top: 0; left: 0; right: 0;
 height: 2px;
+animation: cardPulse 3s ease-in-out infinite;
 }
-.rcard.sponsor::after { background: linear-gradient(90deg, var(–blue), var(–star)); }
-.rcard.player::after { background: linear-gradient(90deg, var(–green), #10b981); }
-.rcard-icon { font-size: 1.1rem; margin-bottom: 4px; display: block; }
+.rcard.sponsor::before { background: linear-gradient(90deg, var(–foam), var(–ice), var(–purple)); }
+.rcard.player::before  { background: linear-gradient(90deg, var(–green), var(–foam)); }
+@keyframes cardPulse {
+0%,100% { opacity: 0.6; }
+50%      { opacity: 1; }
+}
+.rcard-bg-glow {
+position: absolute;
+bottom: -30px; right: -30px;
+width: 100px; height: 100px;
+border-radius: 50%;
+pointer-events: none;
+}
+.rcard.sponsor .rcard-bg-glow { background: radial-gradient(circle, rgba(91,184,212,0.08), transparent 70%); }
+.rcard.player  .rcard-bg-glow { background: radial-gradient(circle, rgba(61,255,192,0.08), transparent 70%); }
+.rcard-icon { font-size: 1.2rem; margin-bottom: 6px; display: block; }
 .rcard-label {
-font-family: ‘Share Tech Mono’, monospace;
-font-size: 0.58rem;
+font-size: 0.55rem;
 letter-spacing: 2px;
 color: var(–text2);
 text-transform: uppercase;
-margin-bottom: 6px;
+margin-bottom: 8px;
 }
 .rcard-val {
 font-family: ‘Orbitron’, sans-serif;
-font-size: 1.45rem;
+font-size: 1.5rem;
 font-weight: 700;
 line-height: 1;
-margin-bottom: 4px;
+margin-bottom: 5px;
+transition: all 0.4s ease;
 }
-.rcard.sponsor .rcard-val { color: var(–blue); }
-.rcard.player .rcard-val { color: var(–green); }
+.rcard.sponsor .rcard-val { color: var(–foam); }
+.rcard.player  .rcard-val { color: var(–green); }
 .rcard-val.loss { color: var(–red) !important; }
 .rcard-sub {
-font-family: ‘Share Tech Mono’, monospace;
 font-size: 0.58rem;
 color: var(–text2);
 line-height: 1.4;
@@ -269,48 +496,48 @@ line-height: 1.4;
 .badge {
 display: inline-block;
 margin-top: 6px;
-padding: 2px 8px;
+padding: 2px 10px;
 border-radius: 20px;
-font-family: ‘Share Tech Mono’, monospace;
-font-size: 0.58rem;
+font-size: 0.55rem;
 letter-spacing: 1px;
+animation: badgePop 0.4s cubic-bezier(0.175,0.885,0.32,1.275) both;
 }
-.badge.profit { background: rgba(52,211,153,0.15); color: var(–green); border: 1px solid rgba(52,211,153,0.3); }
-.badge.loss { background: rgba(248,113,113,0.15); color: var(–red); border: 1px solid rgba(248,113,113,0.3); }
-.badge.earn { background: rgba(192,132,252,0.15); color: var(–star); border: 1px solid rgba(192,132,252,0.3); }
+@keyframes badgePop {
+from { transform: scale(0.5); opacity: 0; }
+to   { transform: scale(1); opacity: 1; }
+}
+.badge.profit { background: rgba(61,255,192,0.1); color: var(–green); border: 1px solid rgba(61,255,192,0.3); }
+.badge.loss   { background: rgba(255,95,122,0.1); color: var(–red);   border: 1px solid rgba(255,95,122,0.3); }
+.badge.earn   { background: rgba(91,184,212,0.1); color: var(–foam);  border: 1px solid rgba(91,184,212,0.3); }
 
-/* COMPARISON CALLOUT */
+/* ── COMPARE BOX ── */
 .compare-box {
-background: rgba(251,191,36,0.07);
-border: 1px solid rgba(251,191,36,0.25);
-border-radius: 8px;
-padding: 14px;
-margin: 0 16px 20px;
-position: relative; z-index: 1;
+background: rgba(240,200,68,0.04);
+border: 1px solid rgba(240,200,68,0.2);
+border-radius: 10px;
+padding: 16px;
+backdrop-filter: blur(8px);
+position: relative;
+overflow: hidden;
+}
+.compare-box::before {
+content: ‘’;
+position: absolute;
+top: 0; left: -100%;
+width: 100%; height: 100%;
+background: linear-gradient(90deg, transparent, rgba(240,200,68,0.04), transparent);
+animation: sweepGold 4s linear infinite;
+}
+@keyframes sweepGold {
+to { left: 100%; }
 }
 .compare-title {
 font-family: ‘Orbitron’, sans-serif;
-font-size: 0.65rem;
+font-size: 0.6rem;
 letter-spacing: 2px;
 color: var(–gold);
-margin-bottom: 10px;
+margin-bottom: 12px;
 }
-.compare-row {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 5px 0;
-font-family: ‘Share Tech Mono’, monospace;
-font-size: 0.65rem;
-border-bottom: 1px solid rgba(251,191,36,0.1);
-}
-.compare-row:last-child { border-bottom: none; }
-.compare-row .clabel { color: var(–text3); }
-.compare-vals { display: flex; gap: 12px; }
-.cv { min-width: 68px; text-align: right; }
-.cv.old { color: var(–red); }
-.cv.new { color: var(–green); }
-.cv.better { color: var(–gold); font-weight: 600; }
 .compare-headers {
 display: flex;
 justify-content: flex-end;
@@ -318,41 +545,83 @@ gap: 12px;
 margin-bottom: 6px;
 }
 .ch {
-min-width: 68px;
+min-width: 72px;
 text-align: right;
-font-family: ‘Share Tech Mono’, monospace;
-font-size: 0.55rem;
+font-size: 0.52rem;
 color: var(–text2);
 letter-spacing: 1px;
 }
+.compare-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 6px 0;
+border-bottom: 1px solid rgba(240,200,68,0.08);
+font-size: 0.65rem;
+transition: background 0.2s;
+}
+.compare-row:last-child { border-bottom: none; }
+.compare-row:hover { background: rgba(240,200,68,0.03); }
+.compare-row .clabel { color: var(–text2); }
+.compare-vals { display: flex; gap: 12px; }
+.cv { min-width: 72px; text-align: right; }
+.cv.old { color: var(–red); }
+.cv.new { color: var(–green); }
+.cv.better { color: var(–gold); font-weight: 600; }
 
-/* BREAKDOWN */
+/* ── BREAKDOWN ── */
 .bcard {
 background: var(–panel);
-border: 1px solid var(–border2);
-border-radius: 8px;
-padding: 16px;
-margin: 0 16px 20px;
-position: relative; z-index: 1;
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 18px;
+backdrop-filter: blur(12px);
+position: relative;
+overflow: hidden;
+}
+.bcard::after {
+content: ‘’;
+position: absolute;
+top: -50%; left: -50%;
+width: 200%; height: 200%;
+background: radial-gradient(ellipse at 50% 50%, rgba(26,107,154,0.06), transparent 60%);
+pointer-events: none;
+animation: bgPulse 6s ease-in-out infinite;
+}
+@keyframes bgPulse {
+0%,100% { transform: scale(1); opacity: 0.5; }
+50%      { transform: scale(1.1); opacity: 1; }
 }
 .bcard-title {
 font-family: ‘Orbitron’, sans-serif;
-font-size: 0.75rem;
+font-size: 0.7rem;
 letter-spacing: 3px;
-color: var(–star);
-margin-bottom: 14px;
+color: var(–foam);
+margin-bottom: 16px;
+position: relative;
 }
 .brow {
 display: flex;
 justify-content: space-between;
 align-items: center;
-padding: 6px 0;
+padding: 7px 0;
 border-bottom: 1px solid var(–border);
-font-family: ‘Share Tech Mono’, monospace;
 font-size: 0.67rem;
+transition: all 0.2s;
+position: relative;
+}
+.brow:hover { padding-left: 6px; }
+.brow:hover::before {
+content: ‘’;
+position: absolute;
+left: 0; top: 50%;
+transform: translateY(-50%);
+width: 2px; height: 60%;
+background: var(–foam);
+border-radius: 2px;
 }
 .brow:last-child { border-bottom: none; }
-.brow .bl { color: var(–text3); }
+.brow .bl { color: var(–text2); }
 .brow .bv { font-weight: 600; }
 .brow .bv.pos { color: var(–green); }
 .brow .bv.neg { color: var(–red); }
@@ -360,450 +629,582 @@ font-size: 0.67rem;
 .brow .bv.neu { color: var(–text); }
 .brow.total {
 margin-top: 4px;
-padding-top: 10px;
-border-top: 1px solid var(–star2);
+padding-top: 12px;
+border-top: 1px solid var(–foam);
 border-bottom: none;
 font-size: 0.72rem;
 }
 .brow.total .bl { color: var(–text); }
-.brow.divider { border-top: 1px solid var(–border2); margin-top: 4px; padding-top: 10px; }
+.brow.divider { border-top: 1px solid var(–border2); margin-top: 4px; padding-top: 12px; }
 
-/* ALL SCENARIOS */
+/* ── SCENARIOS TABLE ── */
 .scard {
 background: var(–panel);
-border: 1px solid var(–border2);
-border-radius: 8px;
-padding: 16px;
-margin: 0 16px 20px;
-position: relative; z-index: 1;
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 18px;
+backdrop-filter: blur(12px);
 }
 .scard-title {
 font-family: ‘Orbitron’, sans-serif;
-font-size: 0.75rem;
+font-size: 0.7rem;
 letter-spacing: 3px;
-color: var(–star);
+color: var(–foam);
 margin-bottom: 4px;
 }
 .scard-sub {
-font-family: ‘Share Tech Mono’, monospace;
-font-size: 0.58rem;
+font-size: 0.55rem;
 color: var(–text2);
 letter-spacing: 1px;
-margin-bottom: 14px;
+margin-bottom: 16px;
 }
 .sc-table { width: 100%; border-collapse: collapse; }
 .sc-table th {
-font-family: ‘Share Tech Mono’, monospace;
-font-size: 0.58rem;
+font-size: 0.55rem;
 color: var(–text2);
 letter-spacing: 1px;
 text-align: left;
-padding: 5px 6px;
+padding: 5px 8px;
 border-bottom: 1px solid var(–border2);
 font-weight: 400;
 }
 .sc-table td {
-font-family: ‘Share Tech Mono’, monospace;
 font-size: 0.65rem;
-padding: 8px 6px;
+padding: 9px 8px;
 border-bottom: 1px solid var(–border);
-vertical-align: middle;
+transition: background 0.2s;
 }
+.sc-table tr:hover td { background: rgba(91,184,212,0.04); }
 .sc-table tr:last-child td { border-bottom: none; }
 .sc-table .rank-cell {
 font-family: ‘Orbitron’, sans-serif;
-font-size: 0.85rem;
+font-size: 0.8rem;
 font-weight: 700;
-color: var(–star);
+color: var(–foam);
 }
 .pos { color: var(–green); font-weight: 600; }
 .neg { color: var(–red); font-weight: 600; }
-.neu { color: var(–text3); }
+.neu { color: var(–text2); }
 .better-cell { color: var(–gold); font-size: 0.6rem; }
 
-/* VERDICT */
+/* ── VERDICT ── */
 .vcard {
 background: var(–panel);
-border: 1px solid var(–border2);
-border-radius: 8px;
-padding: 16px;
-margin: 0 16px 20px;
-position: relative; z-index: 1;
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 18px;
+backdrop-filter: blur(12px);
+position: relative;
 overflow: hidden;
 }
 .vcard::before {
 content: ‘★’;
 position: absolute;
-right: -10px; top: -15px;
-font-size: 6rem;
-color: rgba(192,132,252,0.04);
+right: -20px; top: -20px;
+font-size: 9rem;
+color: rgba(91,184,212,0.03);
 pointer-events: none;
+animation: starRotate 20s linear infinite;
+}
+@keyframes starRotate {
+from { transform: rotate(0deg); }
+to   { transform: rotate(360deg); }
 }
 .vcard-title {
 font-family: ‘Orbitron’, sans-serif;
-font-size: 0.8rem;
+font-size: 0.75rem;
 letter-spacing: 3px;
-color: var(–star);
-margin-bottom: 14px;
+color: var(–foam);
+margin-bottom: 16px;
 }
 .vitem {
 display: flex;
-gap: 10px;
-margin-bottom: 11px;
-font-size: 0.75rem;
-color: var(–text3);
-line-height: 1.5;
+gap: 12px;
+margin-bottom: 12px;
+font-size: 0.73rem;
+color: var(–text2);
+line-height: 1.6;
 align-items: flex-start;
+padding: 8px;
+border-radius: 6px;
+transition: background 0.2s;
 }
-.vicon { font-size: 0.9rem; flex-shrink: 0; }
+.vitem:hover { background: rgba(91,184,212,0.04); }
+.vicon { font-size: 1rem; flex-shrink: 0; }
 .vitem strong { color: var(–text); }
-.vitem .highlight { color: var(–green); font-weight: 600; }
+.vitem .hi { color: var(–green); font-weight: 600; }
 .vitem .warn { color: var(–gold); font-weight: 600; }
 .vitem .danger { color: var(–red); font-weight: 600; }
 
-.footer {
-text-align: center;
-font-family: ‘Share Tech Mono’, monospace;
-font-size: 0.55rem;
-color: var(–text2);
-letter-spacing: 2px;
-margin-top: 40px;
-position: relative; z-index: 1;
-padding: 0 16px;
+/* ── WATER RIPPLE ON CLICK ── */
+.ripple {
+position: fixed;
+border-radius: 50%;
+border: 1px solid rgba(91,184,212,0.5);
+pointer-events: none;
+z-index: 9997;
+animation: rippleOut 0.6s ease-out forwards;
+transform: translate(-50%,-50%);
 }
-.footer-star { color: var(–star); }
+@keyframes rippleOut {
+from { width: 0; height: 0; opacity: 0.8; }
+to   { width: 80px; height: 80px; opacity: 0; }
+}
+
+/* FOOTER */
+footer {
+text-align: center;
+font-size: 0.52rem;
+letter-spacing: 2px;
+color: var(–text2);
+padding: 20px;
+border-top: 1px solid var(–border);
+position: relative;
+}
+footer::before {
+content: ‘’;
+position: absolute;
+top: 0; left: 20%; right: 20%;
+height: 1px;
+background: linear-gradient(90deg, transparent, var(–foam), transparent);
+}
+
+/* SCROLL REVEAL */
+.reveal {
+opacity: 0;
+transform: translateY(20px);
+transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+opacity: 1;
+transform: translateY(0);
+}
+
+/* NUMBER COUNTER ANIMATION */
+.counting { animation: countFlash 0.3s ease; }
+@keyframes countFlash {
+0%,100% { opacity: 1; }
+50%      { opacity: 0.3; }
+}
+
+@media (max-width: 380px) {
+.header-title { font-size: 1.2rem; letter-spacing: 4px; }
+.dev-panel { width: 80px; min-width: 80px; }
+}
 </style>
 
 </head>
 <body>
 
-<!-- STAR FIELD -->
+<!-- CUSTOM CURSOR -->
 
-<div class="starfield" id="starfield"></div>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
 
-<!-- HERO -->
+<!-- OCEAN BACKGROUND -->
 
-<div class="hero">
-  <div class="hero-glow"></div>
-  <div class="hero-eyebrow">⭐ GBS Esports · Season Sponsorship Tool</div>
-  <div class="hero-title">DARK STAR</div>
-  <div class="hero-sub">Sponsorship Deal Analyzer · TH15 · 5-Month Season</div>
-  <div class="hero-divider"></div>
-</div>
+<div class="ocean-bg" id="oceanBg"></div>
 
-<!-- MODE TOGGLE -->
+<div class="app">
 
-<div class="mode-toggle">
-  <button class="mode-btn" id="modeOld" onclick="setMode('old')">
-    <span class="mode-label">ORIGINAL DEAL</span>
-    <span class="mode-pct">42% / 58%</span>
-    <span class="mode-desc">Sponsor takes 42% · Team splits 58% ÷ 3</span>
-  </button>
-  <button class="mode-btn active" id="modeNew" onclick="setMode('new')">
-    <span class="mode-label">★ 4TH PLAYER</span>
-    <span class="mode-pct">25% × 4</span>
-    <span class="mode-desc">Equal 4-way split · Sponsor pays stipend</span>
-  </button>
-</div>
+<!-- HEADER -->
 
-<!-- PLACEMENT SELECTOR -->
+<header>
+  <div class="dev-panel">
+    <img class="dev-img" src="/mnt/user-data/uploads/IMG_20260513_092029_250.jpeg" alt="Dev">
+    <div class="dev-glow"></div>
+    <div class="dev-scan"></div>
+    <div class="dev-label">★ SABI / PG ★</div>
+  </div>
+  <div class="header-center">
+    <div class="header-eyebrow">⭐ GBS ESPORTS · TH15 · SEASON TOOL</div>
+    <div class="header-title">DARK STAR</div>
+    <div class="header-sub">SPONSORSHIP DEAL ANALYZER · 5-MONTH SEASON</div>
+  </div>
+  <div class="header-stats">
+    <div class="hstat">POOL <span class="hstat-val">$44K</span></div>
+    <div class="hstat">EVENTS <span class="hstat-val">×5</span></div>
+    <div class="hstat">STIPEND <span class="hstat-val">$750</span></div>
+  </div>
+</header>
 
-<div class="section">
-  <div class="section-label">▸ Select same placement across all 5 events</div>
-  <div class="placement-grid" id="placementGrid">
-    <button class="placement-btn active" onclick="setPlacement(0)">
-      <span class="p-rank">🥇 1ST</span>
-      <span class="p-label">CHAMPION</span>
+<!-- MAIN -->
+
+<main>
+
+  <!-- MODE TOGGLE -->
+
+  <div class="mode-toggle reveal">
+    <button class="mode-btn" id="modeOld" onclick="setMode('old')">
+      <span class="ml">ORIGINAL DEAL</span>
+      <span class="mp">42% / 58%</span>
+      <span class="md">Sponsor takes 42%<br>Team splits 58% ÷ 3</span>
     </button>
-    <button class="placement-btn" onclick="setPlacement(1)">
-      <span class="p-rank">🥈 2ND</span>
-      <span class="p-label">RUNNER-UP</span>
-    </button>
-    <button class="placement-btn" onclick="setPlacement(2)">
-      <span class="p-rank">🥉 3RD</span>
-      <span class="p-label">THIRD</span>
-    </button>
-    <button class="placement-btn" onclick="setPlacement(3)">
-      <span class="p-rank">4TH</span>
-      <span class="p-label">FOURTH</span>
-    </button>
-    <button class="placement-btn" onclick="setPlacement(4)">
-      <span class="p-rank">5-6TH</span>
-      <span class="p-label">QUARTER</span>
-    </button>
-    <button class="placement-btn" onclick="setPlacement(5)">
-      <span class="p-rank">7-8TH</span>
-      <span class="p-label">LAST</span>
+    <button class="mode-btn active" id="modeNew" onclick="setMode('new')">
+      <span class="ml">★ 4TH PLAYER MODEL</span>
+      <span class="mp">25% × 4</span>
+      <span class="md">Equal 4-way split<br>Sponsor pays $150/mo</span>
     </button>
   </div>
-</div>
 
-<!-- RESULT CARDS -->
+  <!-- PLACEMENT SELECTOR -->
 
-<div class="result-grid">
-  <div class="rcard sponsor">
-    <span class="rcard-icon">💼</span>
-    <div class="rcard-label">Sponsor Net</div>
-    <div class="rcard-val" id="sponsorVal">—</div>
-    <div class="rcard-sub" id="sponsorSub">—</div>
-    <div id="sponsorBadge"></div>
-  </div>
-  <div class="rcard player">
-    <span class="rcard-icon">🎮</span>
-    <div class="rcard-label">Per Player Net</div>
-    <div class="rcard-val" id="playerVal">—</div>
-    <div class="rcard-sub" id="playerSub">—</div>
-    <div id="playerBadge"></div>
-  </div>
-</div>
-
-<!-- COMPARISON BOX -->
-
-<div class="compare-box" id="compareBox">
-  <div class="compare-title">⚡ VS ORIGINAL DEAL — SAME PLACEMENT</div>
-  <div class="compare-headers">
-    <span class="ch">42% DEAL</span>
-    <span class="ch">4TH PLAYER</span>
-  </div>
-  <div class="compare-row">
-    <span class="clabel">Sponsor earns (prize)</span>
-    <div class="compare-vals">
-      <span class="cv old" id="cmp-sOld">—</span>
-      <span class="cv new" id="cmp-sNew">—</span>
+  <div class="reveal">
+    <div class="section-label">▸ Select placement — same across all 5 events</div>
+    <div class="placement-grid">
+      <button class="placement-btn active" onclick="setPlacement(0)">
+        <span class="p-rank">🥇 1ST</span><span class="p-label">CHAMPION</span>
+      </button>
+      <button class="placement-btn" onclick="setPlacement(1)">
+        <span class="p-rank">🥈 2ND</span><span class="p-label">RUNNER-UP</span>
+      </button>
+      <button class="placement-btn" onclick="setPlacement(2)">
+        <span class="p-rank">🥉 3RD</span><span class="p-label">THIRD</span>
+      </button>
+      <button class="placement-btn" onclick="setPlacement(3)">
+        <span class="p-rank">4TH</span><span class="p-label">FOURTH</span>
+      </button>
+      <button class="placement-btn" onclick="setPlacement(4)">
+        <span class="p-rank">5-6TH</span><span class="p-label">QUARTER</span>
+      </button>
+      <button class="placement-btn" onclick="setPlacement(5)">
+        <span class="p-rank">7-8TH</span><span class="p-label">LAST PLACE</span>
+      </button>
     </div>
   </div>
-  <div class="compare-row">
-    <span class="clabel">Sponsor net (after stipend)</span>
-    <div class="compare-vals">
-      <span class="cv old" id="cmp-sNetOld">—</span>
-      <span class="cv new" id="cmp-sNetNew">—</span>
+
+  <!-- RESULT CARDS -->
+
+  <div class="result-grid reveal">
+    <div class="rcard sponsor">
+      <div class="rcard-bg-glow"></div>
+      <span class="rcard-icon">💼</span>
+      <div class="rcard-label">Sponsor Net</div>
+      <div class="rcard-val" id="sponsorVal">—</div>
+      <div class="rcard-sub" id="sponsorSub">—</div>
+      <div id="sponsorBadge"></div>
+    </div>
+    <div class="rcard player">
+      <div class="rcard-bg-glow"></div>
+      <span class="rcard-icon">🎮</span>
+      <div class="rcard-label">Per Player Net</div>
+      <div class="rcard-val" id="playerVal">—</div>
+      <div class="rcard-sub" id="playerSub">—</div>
+      <div id="playerBadge"></div>
     </div>
   </div>
-  <div class="compare-row">
-    <span class="clabel">Per player total</span>
-    <div class="compare-vals">
-      <span class="cv old" id="cmp-pOld">—</span>
-      <span class="cv new better" id="cmp-pNew">—</span>
+
+  <!-- COMPARE BOX -->
+
+  <div class="compare-box reveal">
+    <div class="compare-title">⚡ VS ORIGINAL DEAL — SAME PLACEMENT</div>
+    <div class="compare-headers">
+      <span class="ch">42% DEAL</span>
+      <span class="ch">4TH PLAYER</span>
+    </div>
+    <div class="compare-row">
+      <span class="clabel">Sponsor earns (prize)</span>
+      <div class="compare-vals">
+        <span class="cv old" id="cmp-sOld">—</span>
+        <span class="cv new" id="cmp-sNew">—</span>
+      </div>
+    </div>
+    <div class="compare-row">
+      <span class="clabel">Sponsor net (after stipend)</span>
+      <div class="compare-vals">
+        <span class="cv old" id="cmp-sNetOld">—</span>
+        <span class="cv new" id="cmp-sNetNew">—</span>
+      </div>
+    </div>
+    <div class="compare-row">
+      <span class="clabel">Per player total</span>
+      <div class="compare-vals">
+        <span class="cv old" id="cmp-pOld">—</span>
+        <span class="cv new better" id="cmp-pNew">—</span>
+      </div>
+    </div>
+    <div class="compare-row">
+      <span class="clabel">Player gains vs old deal</span>
+      <div class="compare-vals">
+        <span class="cv" style="color:var(--text2)">—</span>
+        <span class="cv better" id="cmp-diff">—</span>
+      </div>
     </div>
   </div>
-  <div class="compare-row">
-    <span class="clabel">Player gains vs old deal</span>
-    <div class="compare-vals">
-      <span class="cv" style="color:var(--text2)">—</span>
-      <span class="cv better" id="cmp-diff">—</span>
+
+  <!-- BREAKDOWN -->
+
+  <div class="bcard reveal">
+    <div class="bcard-title">⚡ SEASON BREAKDOWN</div>
+    <div id="breakdownRows"></div>
+  </div>
+
+  <!-- ALL SCENARIOS -->
+
+  <div class="scard reveal">
+    <div class="scard-title">★ ALL SCENARIOS</div>
+    <div class="scard-sub">SAME PLACEMENT ACROSS ALL 5 EVENTS (3× MONTHLY + 1× LCQ + 1× GF)</div>
+    <table class="sc-table">
+      <thead>
+        <tr>
+          <th>RANK</th>
+          <th>SPONSOR EARNS</th>
+          <th>SPONSOR NET</th>
+          <th>PER PLAYER</th>
+          <th id="thDiff">VS OLD</th>
+        </tr>
+      </thead>
+      <tbody id="scenariosBody"></tbody>
+    </table>
+  </div>
+
+  <!-- VERDICT -->
+
+  <div class="vcard reveal">
+    <div class="vcard-title">★ DARK STAR VERDICT</div>
+    <div class="vitem">
+      <span class="vicon">⭐</span>
+      <span>The <strong>4th Player model is significantly better for your friend's team.</strong> At every single placement, each player earns more compared to the original 42% deal.</span>
+    </div>
+    <div class="vitem">
+      <span class="vicon">📉</span>
+      <span>The sponsor earns <span class="danger">less prize money</span> under the 4th player model — down from 42% to 25%. But they still profit at most placements given the low $750 total investment.</span>
+    </div>
+    <div class="vitem">
+      <span class="vicon">🤝</span>
+      <span>Framing the sponsor as a <strong>"4th team member"</strong> is smart negotiation — it sounds collaborative, creates shared incentive to win, and naturally justifies the lower cut.</span>
+    </div>
+    <div class="vitem">
+      <span class="vicon">⚠️</span>
+      <span>The sponsor may <span class="warn">push back hard</span> — at 7-8th placement their net drops to <strong>+$178</strong> vs <strong>+$928</strong> under the old deal. A big loss of return for them if results are poor.</span>
+    </div>
+    <div class="vitem">
+      <span class="vicon">✅</span>
+      <span><strong>Best move:</strong> Push the 4th player model. If they resist, counter at 28–30% cut. <span class="danger">Never accept 42%</span> — that's nearly half the winnings for a sponsor investing only $150/month.</span>
     </div>
   </div>
-</div>
 
-<!-- BREAKDOWN -->
+</main>
 
-<div class="bcard">
-  <div class="bcard-title">⚡ SEASON BREAKDOWN</div>
-  <div id="breakdownRows"></div>
-</div>
-
-<!-- ALL SCENARIOS TABLE -->
-
-<div class="scard">
-  <div class="scard-title">★ ALL SCENARIOS</div>
-  <div class="scard-sub" id="tableSubtitle">SAME PLACEMENT ACROSS ALL 5 EVENTS (3× MONTHLY + 1× LCQ + 1× GF)</div>
-  <table class="sc-table">
-    <thead>
-      <tr>
-        <th>RANK</th>
-        <th>SPONSOR EARNS</th>
-        <th>SPONSOR NET</th>
-        <th>PER PLAYER</th>
-        <th id="thDiff">VS OLD</th>
-      </tr>
-    </thead>
-    <tbody id="scenariosBody"></tbody>
-  </table>
-</div>
-
-<!-- VERDICT -->
-
-<div class="vcard">
-  <div class="vcard-title">★ DARK STAR VERDICT</div>
-  <div class="vitem">
-    <span class="vicon">⭐</span>
-    <span>The <strong>4th Player model is significantly better for your friend's team.</strong> At every single placement, each player walks away with more money compared to the original 42% deal.</span>
-  </div>
-  <div class="vitem">
-    <span class="vicon">📉</span>
-    <span>The sponsor <span class="danger">earns less</span> under this model — they go from <strong>42% down to 25%</strong> of prize money. But they still profit at most placements due to the low $250 stipend investment.</span>
-  </div>
-  <div class="vitem">
-    <span class="vicon">🤝</span>
-    <span>Framing the sponsor as a <strong>"4th team member"</strong> is a smart negotiation move. It sounds collaborative, positions them as invested in wins, and naturally justifies the lower cut.</span>
-  </div>
-  <div class="vitem">
-    <span class="vicon">⚠️</span>
-    <span>The sponsor may <span class="warn">reject this</span> since at 7-8th placement their net drops to <strong>+$428</strong> vs +$1,178 under the old deal — a big difference for them if results are poor.</span>
-  </div>
-  <div class="vitem">
-    <span class="vicon">✅</span>
-    <span><strong>Best case for your friend:</strong> Push the 4th player model. If sponsor resists, counter-offer with 30% cut + keep the stipend. Never accept 42% — that's too steep for 3 active players doing all the competing.</span>
-  </div>
-</div>
-
-<div class="footer">
-  <span class="footer-star">★</span> DARK STAR · GBS GALAXY BATTLE SERIES · SPONSORSHIP ANALYZER · FOR PLANNING PURPOSES ONLY <span class="footer-star">★</span>
+<footer>
+  <span style="color:var(--foam)">★</span> DARK STAR · GALAXY BATTLE SERIES · GBS ESPORTS · SPONSORSHIP ANALYZER · FOR PLANNING PURPOSES ONLY <span style="color:var(--foam)">★</span>
+</footer>
 </div>
 
 <script>
-  // --- STAR FIELD ---
-  const sf = document.getElementById('starfield');
-  for (let i = 0; i < 80; i++) {
-    const s = document.createElement('div');
-    s.className = 'star-dot';
-    const size = Math.random() * 2 + 0.5;
-    s.style.cssText = `
-      width:${size}px; height:${size}px;
-      top:${Math.random()*100}%; left:${Math.random()*100}%;
-      --dur:${2+Math.random()*4}s; --op:${0.3+Math.random()*0.6};
-      animation-delay:${Math.random()*4}s;
-    `;
-    sf.appendChild(s);
-  }
+// ── CURSOR ──
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX; my=e.clientY;
+  cur.style.left=mx+'px'; cur.style.top=my+'px';
+});
+(function animRing(){
+  rx+=(mx-rx)*0.12; ry+=(my-ry)*0.12;
+  ring.style.left=rx+'px'; ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+})();
 
-  // --- DATA ---
-  const placements = [
-    { label: '1ST',   emoji: '🥇', prizeSmall: 2280, prizeGF: 5600 },
-    { label: '2ND',   emoji: '🥈', prizeSmall: 1040, prizeGF: 2800 },
-    { label: '3RD',   emoji: '🥉', prizeSmall: 620,  prizeGF: 1600 },
-    { label: '4TH',   emoji: '4️⃣', prizeSmall: 500,  prizeGF: 1400 },
-    { label: '5-6TH', emoji: '5️⃣', prizeSmall: 420,  prizeGF: 1200 },
-    { label: '7-8TH', emoji: '7️⃣', prizeSmall: 360,  prizeGF: 1100 },
-  ];
+// ── RIPPLE ON CLICK ──
+document.addEventListener('click',e=>{
+  const r=document.createElement('div');
+  r.className='ripple';
+  r.style.left=e.clientX+'px';
+  r.style.top=e.clientY+'px';
+  document.body.appendChild(r);
+  setTimeout(()=>r.remove(),700);
+});
 
-  const STIPEND = 750; // $150/month × 5 months to team
-  const SMALL_EVENTS = 4; // 3 monthly + 1 LCQ
-  const GF_EVENTS = 1;
+// ── OCEAN BG: RAYS, BUBBLES, FISH, PARTICLES ──
+const bg=document.getElementById('oceanBg');
 
-  let currentMode = 'new';
-  let currentPlacement = 0;
+// Rays
+for(let i=0;i<12;i++){
+  const ray=document.createElement('div');
+  ray.className='ray';
+  const angle=(i/12)*80-40;
+  ray.style.cssText=`left:${5+i*8}%;--ra:${angle}deg;--rb:${(Math.random()*10-5)}deg;--rd:${4+Math.random()*6}s;animation-delay:${-Math.random()*8}s;`;
+  bg.appendChild(ray);
+}
 
-  function calcOld(ps, pg) {
-    const total = ps * SMALL_EVENTS + pg * GF_EVENTS;
-    const sponsorEarned = total * 0.42;
-    const sponsorNet = sponsorEarned - STIPEND;
-    const teamEarned = total * 0.58;
-    const perPlayer = teamEarned / 3 + STIPEND / 3;
-    return { total, sponsorEarned, sponsorNet, teamEarned, perPlayer };
-  }
+// Bubbles
+for(let i=0;i<25;i++){
+  const b=document.createElement('div');
+  b.className='bubble';
+  const size=4+Math.random()*12;
+  b.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}%;--bd:${6+Math.random()*10}s;--bdelay:${-Math.random()*12}s;--bx:${(Math.random()-0.5)*60}px;--bs:${0.8+Math.random()*0.4};`;
+  bg.appendChild(b);
+}
 
-  function calcNew(ps, pg) {
-    const total = ps * SMALL_EVENTS + pg * GF_EVENTS;
-    const sponsorEarned = total * 0.25;
-    const sponsorNet = sponsorEarned - STIPEND;
-    const perPlayer = total * 0.25 + STIPEND / 3;
-    return { total, sponsorEarned, sponsorNet, perPlayer };
-  }
+// Fish (using unicode fish-like chars and emoji)
+const fishChars=['🐟','🐠','🐡','🐙'];
+for(let i=0;i<10;i++){
+  const f=document.createElement('div');
+  f.className='fish';
+  f.textContent=fishChars[Math.floor(Math.random()*fishChars.length)];
+  const yBase=10+Math.random()*80;
+  const yDrift=(Math.random()-0.5)*20;
+  f.style.cssText=`top:${yBase}%;--fs:${0.8+Math.random()*1.2}rem;--fd:${12+Math.random()*16}s;--fdelay:${-Math.random()*20}s;--fy:0px;--fy2:${yDrift}px;`;
+  bg.appendChild(f);
+}
 
-  function fmt(n, sign=true) {
-    const abs = Math.abs(n).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    if (!sign) return '$' + abs;
-    return (n < 0 ? '-' : '+') + '$' + abs;
-  }
-  function fabs(n) { return '$' + Math.abs(n).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+// Particles
+for(let i=0;i<30;i++){
+  const p=document.createElement('div');
+  p.className='particle';
+  const size=1+Math.random()*2;
+  p.style.cssText=`width:${size}px;height:${size}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--pd:${3+Math.random()*6}s;--pdelay:${-Math.random()*6}s;--px:${(Math.random()-0.5)*20}px;--py:${(Math.random()-0.5)*20}px;--po:${0.2+Math.random()*0.4};`;
+  bg.appendChild(p);
+}
 
-  function setMode(m) {
-    currentMode = m;
-    document.getElementById('modeOld').classList.toggle('active', m === 'old');
-    document.getElementById('modeNew').classList.toggle('active', m === 'new');
-    document.getElementById('thDiff').textContent = m === 'new' ? 'VS OLD' : '—';
-    render();
-  }
+// ── SCROLL REVEAL ──
+const reveals=document.querySelectorAll('.reveal');
+const io=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){
+      setTimeout(()=>e.target.classList.add('visible'),i*60);
+    }
+  });
+},{threshold:0.1});
+reveals.forEach(r=>io.observe(r));
+// Trigger first visible ones
+setTimeout(()=>reveals.forEach(r=>io.observe(r)),100);
 
-  function setPlacement(idx) {
-    currentPlacement = idx;
-    document.querySelectorAll('.placement-btn').forEach((b, i) => {
-      b.classList.toggle('active', i === idx);
-    });
-    render();
-  }
+// ── DATA ──
+const placements=[
+  {label:'1ST',  emoji:'🥇',prizeSmall:2280,prizeGF:5600},
+  {label:'2ND',  emoji:'🥈',prizeSmall:1040,prizeGF:2800},
+  {label:'3RD',  emoji:'🥉',prizeSmall:620, prizeGF:1600},
+  {label:'4TH',  emoji:'4️⃣',prizeSmall:500, prizeGF:1400},
+  {label:'5-6TH',emoji:'5️⃣',prizeSmall:420, prizeGF:1200},
+  {label:'7-8TH',emoji:'7️⃣',prizeSmall:360, prizeGF:1100},
+];
+const STIPEND=750;
+const SMALL_EVENTS=4;
+const GF_EVENTS=1;
+let currentMode='new', currentPlacement=0;
 
-  function render() {
-    const p = placements[currentPlacement];
-    const isNew = currentMode === 'new';
-    const d = isNew ? calcNew(p.prizeSmall, p.prizeGF) : calcOld(p.prizeSmall, p.prizeGF);
-    const dOld = calcOld(p.prizeSmall, p.prizeGF);
-    const dNew = calcNew(p.prizeSmall, p.prizeGF);
+function calcOld(ps,pg){
+  const total=ps*SMALL_EVENTS+pg*GF_EVENTS;
+  const sponsorEarned=total*0.42;
+  const sponsorNet=sponsorEarned-STIPEND;
+  const perPlayer=total*0.58/3+STIPEND/3;
+  return{total,sponsorEarned,sponsorNet,perPlayer};
+}
+function calcNew(ps,pg){
+  const total=ps*SMALL_EVENTS+pg*GF_EVENTS;
+  const sponsorEarned=total*0.25;
+  const sponsorNet=sponsorEarned-STIPEND;
+  const perPlayer=total*0.25+STIPEND/3;
+  return{total,sponsorEarned,sponsorNet,perPlayer};
+}
+function fmt(n){
+  const abs=Math.abs(n).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  return(n<0?'-':'+')+'$'+abs;
+}
+function fabs(n){return'$'+Math.abs(n).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
 
-    // Sponsor card
-    const sv = document.getElementById('sponsorVal');
-    sv.textContent = fmt(d.sponsorNet);
-    sv.className = 'rcard-val' + (d.sponsorNet < 0 ? ' loss' : '');
-    document.getElementById('sponsorSub').textContent =
-      isNew
-        ? `Earned ${fabs(d.sponsorEarned)} (25%) − $750 stipend`
-        : `Earned ${fabs(d.sponsorEarned)} (42%) − $750 stipend`;
-    document.getElementById('sponsorBadge').innerHTML =
-      d.sponsorNet >= 0
-        ? `<span class="badge profit">PROFIT</span>`
-        : `<span class="badge loss">LOSS</span>`;
+function animateVal(el,val){
+  el.classList.add('counting');
+  setTimeout(()=>el.classList.remove('counting'),350);
+  el.textContent=val;
+}
 
-    // Player card
-    document.getElementById('playerVal').textContent = fabs(d.perPlayer);
-    document.getElementById('playerSub').textContent =
-      isNew
-        ? `25% share + ~$250 stipend`
-        : `58%÷3 share + ~$250 stipend`;
-    document.getElementById('playerBadge').innerHTML = `<span class="badge earn">EARNED</span>`;
-
-    // Comparison box
-    document.getElementById('cmp-sOld').textContent = fabs(dOld.sponsorEarned);
-    document.getElementById('cmp-sNew').textContent = fabs(dNew.sponsorEarned);
-    document.getElementById('cmp-sNetOld').textContent = fmt(dOld.sponsorNet);
-    document.getElementById('cmp-sNetNew').textContent = fmt(dNew.sponsorNet);
-    document.getElementById('cmp-pOld').textContent = fabs(dOld.perPlayer);
-    document.getElementById('cmp-pNew').textContent = fabs(dNew.perPlayer);
-    const diff = dNew.perPlayer - dOld.perPlayer;
-    document.getElementById('cmp-diff').textContent = fmt(diff) + ' per player';
-
-    // Breakdown
-    const total = p.prizeSmall * SMALL_EVENTS + p.prizeGF * GF_EVENTS;
-    document.getElementById('breakdownRows').innerHTML = `
-      <div class="brow"><span class="bl">Monthly Finals ×3 + LCQ ×1 prize (${p.label})</span><span class="bv acc">${fabs(p.prizeSmall * SMALL_EVENTS)}</span></div>
-      <div class="brow"><span class="bl">Grand Finals ×1 prize (${p.label})</span><span class="bv acc">${fabs(p.prizeGF)}</span></div>
-      <div class="brow"><span class="bl">Total Season Prize Pool</span><span class="bv neu">${fabs(total)}</span></div>
-      <div class="brow"><span class="bl">Sponsor share (${isNew ? '25%' : '42%'})</span><span class="bv pos">${fabs(d.sponsorEarned)}</span></div>
-      <div class="brow"><span class="bl">Sponsor stipend paid out</span><span class="bv neg">−$750</span></div>
-      <div class="brow total"><span class="bl">SPONSOR NET</span><span class="bv ${d.sponsorNet>=0?'pos':'neg'}">${fmt(d.sponsorNet)}</span></div>
-      <div class="brow divider"><span class="bl">Team prize pool (${isNew ? '75% shared 3 players' : '58% shared 3 players'})</span><span class="bv pos">${fabs(isNew ? total*0.75 : total*0.58)}</span></div>
-      <div class="brow"><span class="bl">Each player prize share</span><span class="bv pos">${fabs(isNew ? total*0.25 : total*0.58/3)}</span></div>
-      <div class="brow"><span class="bl">Stipend per player ($750 ÷ 3)</span><span class="bv pos">+$250</span></div>
-      <div class="brow total"><span class="bl">PER PLAYER TOTAL</span><span class="bv pos">${fabs(d.perPlayer)}</span></div>
-    `;
-
-    // Table
-    buildTable();
-  }
-
-  function buildTable() {
-    const isNew = currentMode === 'new';
-    const tbody = document.getElementById('scenariosBody');
-    tbody.innerHTML = '';
-    placements.forEach((p, i) => {
-      const dO = calcOld(p.prizeSmall, p.prizeGF);
-      const dN = calcNew(p.prizeSmall, p.prizeGF);
-      const d = isNew ? dN : dO;
-      const diff = dN.perPlayer - dO.perPlayer;
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td class="rank-cell">${p.emoji} ${p.label}</td>
-        <td class="pos">${fabs(d.sponsorEarned)}</td>
-        <td class="${d.sponsorNet>=0?'pos':'neg'}">${fmt(d.sponsorNet)}</td>
-        <td class="pos">${fabs(d.perPlayer)}</td>
-        <td class="better-cell">${isNew ? (diff>=0?'↑ +$'+Math.round(diff):'↓ -$'+Math.abs(Math.round(diff))) : '—'}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  // init
+function setMode(m){
+  currentMode=m;
+  document.getElementById('modeOld').classList.toggle('active',m==='old');
+  document.getElementById('modeNew').classList.toggle('active',m==='new');
+  document.getElementById('thDiff').textContent=m==='new'?'VS OLD':'—';
   render();
+}
+function setPlacement(idx){
+  currentPlacement=idx;
+  document.querySelectorAll('.placement-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  render();
+}
+
+function render(){
+  const p=placements[currentPlacement];
+  const isNew=currentMode==='new';
+  const d=isNew?calcNew(p.prizeSmall,p.prizeGF):calcOld(p.prizeSmall,p.prizeGF);
+  const dOld=calcOld(p.prizeSmall,p.prizeGF);
+  const dNew=calcNew(p.prizeSmall,p.prizeGF);
+
+  // Sponsor card
+  const sv=document.getElementById('sponsorVal');
+  animateVal(sv,fmt(d.sponsorNet));
+  sv.className='rcard-val'+(d.sponsorNet<0?' loss':'');
+  document.getElementById('sponsorSub').textContent=
+    `Earned ${fabs(d.sponsorEarned)} (${isNew?'25%':'42%'}) − $750 stipend`;
+  document.getElementById('sponsorBadge').innerHTML=
+    d.sponsorNet>=0
+      ?`<span class="badge profit">PROFIT</span>`
+      :`<span class="badge loss">LOSS</span>`;
+
+  // Player card
+  animateVal(document.getElementById('playerVal'),fabs(d.perPlayer));
+  document.getElementById('playerSub').textContent=
+    isNew?`25% prize share + $250 stipend`:`58%÷3 prize share + $250 stipend`;
+  document.getElementById('playerBadge').innerHTML=`<span class="badge earn">EARNED</span>`;
+
+  // Compare
+  document.getElementById('cmp-sOld').textContent=fabs(dOld.sponsorEarned);
+  document.getElementById('cmp-sNew').textContent=fabs(dNew.sponsorEarned);
+  document.getElementById('cmp-sNetOld').textContent=fmt(dOld.sponsorNet);
+  document.getElementById('cmp-sNetNew').textContent=fmt(dNew.sponsorNet);
+  document.getElementById('cmp-pOld').textContent=fabs(dOld.perPlayer);
+  document.getElementById('cmp-pNew').textContent=fabs(dNew.perPlayer);
+  const diff=dNew.perPlayer-dOld.perPlayer;
+  document.getElementById('cmp-diff').textContent=fmt(diff)+' per player';
+
+  // Breakdown
+  const total=p.prizeSmall*SMALL_EVENTS+p.prizeGF*GF_EVENTS;
+  document.getElementById('breakdownRows').innerHTML=`
+    <div class="brow"><span class="bl">Monthly Finals ×3 + LCQ ×1 (${p.label})</span><span class="bv acc">${fabs(p.prizeSmall*SMALL_EVENTS)}</span></div>
+    <div class="brow"><span class="bl">Grand Finals ×1 (${p.label})</span><span class="bv acc">${fabs(p.prizeGF)}</span></div>
+    <div class="brow"><span class="bl">Total Season Prize Pool</span><span class="bv neu">${fabs(total)}</span></div>
+    <div class="brow"><span class="bl">Sponsor share (${isNew?'25%':'42%'})</span><span class="bv pos">${fabs(d.sponsorEarned)}</span></div>
+    <div class="brow"><span class="bl">Sponsor stipend paid out ($150×5)</span><span class="bv neg">−$750</span></div>
+    <div class="brow total"><span class="bl">SPONSOR NET PROFIT / LOSS</span><span class="bv ${d.sponsorNet>=0?'pos':'neg'}">${fmt(d.sponsorNet)}</span></div>
+    <div class="brow divider"><span class="bl">Team prize (${isNew?'75% ÷ 3 players':'58% ÷ 3 players'})</span><span class="bv pos">${fabs(isNew?total*0.75:total*0.58)}</span></div>
+    <div class="brow"><span class="bl">Each player prize share</span><span class="bv pos">${fabs(isNew?total*0.25:total*0.58/3)}</span></div>
+    <div class="brow"><span class="bl">Stipend per player ($750 ÷ 3)</span><span class="bv pos">+$250</span></div>
+    <div class="brow total"><span class="bl">PER PLAYER TOTAL</span><span class="bv pos">${fabs(d.perPlayer)}</span></div>
+  `;
+
+  buildTable();
+}
+
+function buildTable(){
+  const isNew=currentMode==='new';
+  const tbody=document.getElementById('scenariosBody');
+  tbody.innerHTML='';
+  placements.forEach((p,i)=>{
+    const dO=calcOld(p.prizeSmall,p.prizeGF);
+    const dN=calcNew(p.prizeSmall,p.prizeGF);
+    const d=isNew?dN:dO;
+    const diff=dN.perPlayer-dO.perPlayer;
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td class="rank-cell">${p.emoji} ${p.label}</td>
+      <td class="pos">${fabs(d.sponsorEarned)}</td>
+      <td class="${d.sponsorNet>=0?'pos':'neg'}">${fmt(d.sponsorNet)}</td>
+      <td class="pos">${fabs(d.perPlayer)}</td>
+      <td class="better-cell">${isNew?(diff>=0?'↑ +$'+Math.round(diff):'↓ −$'+Math.abs(Math.round(diff))):'—'}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// INIT
+render();
+// Trigger reveals on load
+setTimeout(()=>{
+  document.querySelectorAll('.reveal').forEach((el,i)=>{
+    setTimeout(()=>el.classList.add('visible'),i*100);
+  });
+},200);
 </script>
 
 </body>
