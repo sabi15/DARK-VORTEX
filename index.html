@@ -677,7 +677,7 @@ padding: 0 16px;
     { label: '7-8TH', emoji: '7️⃣', prizeSmall: 360,  prizeGF: 1100 },
   ];
 
-  const STIPEND = 250;
+  const STIPEND = 750; // $150/month × 5 months to team
   const SMALL_EVENTS = 4; // 3 monthly + 1 LCQ
   const GF_EVENTS = 1;
 
@@ -737,8 +737,8 @@ padding: 0 16px;
     sv.className = 'rcard-val' + (d.sponsorNet < 0 ? ' loss' : '');
     document.getElementById('sponsorSub').textContent =
       isNew
-        ? `Earned ${fabs(d.sponsorEarned)} (25%) − $250 stipend`
-        : `Earned ${fabs(d.sponsorEarned)} (42%) − $250 stipend`;
+        ? `Earned ${fabs(d.sponsorEarned)} (25%) − $750 stipend`
+        : `Earned ${fabs(d.sponsorEarned)} (42%) − $750 stipend`;
     document.getElementById('sponsorBadge').innerHTML =
       d.sponsorNet >= 0
         ? `<span class="badge profit">PROFIT</span>`
@@ -748,8 +748,8 @@ padding: 0 16px;
     document.getElementById('playerVal').textContent = fabs(d.perPlayer);
     document.getElementById('playerSub').textContent =
       isNew
-        ? `25% share + ~$83 stipend`
-        : `58%÷3 share + ~$83 stipend`;
+        ? `25% share + ~$250 stipend`
+        : `58%÷3 share + ~$250 stipend`;
     document.getElementById('playerBadge').innerHTML = `<span class="badge earn">EARNED</span>`;
 
     // Comparison box
@@ -769,11 +769,11 @@ padding: 0 16px;
       <div class="brow"><span class="bl">Grand Finals ×1 prize (${p.label})</span><span class="bv acc">${fabs(p.prizeGF)}</span></div>
       <div class="brow"><span class="bl">Total Season Prize Pool</span><span class="bv neu">${fabs(total)}</span></div>
       <div class="brow"><span class="bl">Sponsor share (${isNew ? '25%' : '42%'})</span><span class="bv pos">${fabs(d.sponsorEarned)}</span></div>
-      <div class="brow"><span class="bl">Sponsor stipend paid out</span><span class="bv neg">−$250</span></div>
+      <div class="brow"><span class="bl">Sponsor stipend paid out</span><span class="bv neg">−$750</span></div>
       <div class="brow total"><span class="bl">SPONSOR NET</span><span class="bv ${d.sponsorNet>=0?'pos':'neg'}">${fmt(d.sponsorNet)}</span></div>
       <div class="brow divider"><span class="bl">Team prize pool (${isNew ? '75% shared 3 players' : '58% shared 3 players'})</span><span class="bv pos">${fabs(isNew ? total*0.75 : total*0.58)}</span></div>
       <div class="brow"><span class="bl">Each player prize share</span><span class="bv pos">${fabs(isNew ? total*0.25 : total*0.58/3)}</span></div>
-      <div class="brow"><span class="bl">Stipend per player (~÷3)</span><span class="bv pos">+~$83</span></div>
+      <div class="brow"><span class="bl">Stipend per player ($750 ÷ 3)</span><span class="bv pos">+$250</span></div>
       <div class="brow total"><span class="bl">PER PLAYER TOTAL</span><span class="bv pos">${fabs(d.perPlayer)}</span></div>
     `;
 
