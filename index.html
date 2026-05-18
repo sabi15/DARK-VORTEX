@@ -37,10 +37,10 @@ body{
 }
 
 /* ══ CURSOR ══ */
-#cur,#cur2{position:fixed;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);}
+#cur,#cur2{position:fixed;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);display:none;} @media (pointer: fine){#cur,#cur2{display:block;}}
 #cur{width:10px;height:10px;background:var(--foam);box-shadow:0 0 10px var(--foam),0 0 20px rgba(91,184,212,0.4);transition:transform .08s;}
 #cur2{width:28px;height:28px;border:1px solid rgba(91,184,212,0.45);transition:all .14s ease;}
-body{cursor:none;}
+@media (pointer: fine) { body { cursor: none; } }
 
 /* ══ OCEAN BG ══ */
 #ocean{position:fixed;inset:0;z-index:0;overflow:hidden;
@@ -163,13 +163,18 @@ header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
 .range-wrap{position:relative;}
 .range-val{position:absolute;right:0;top:-22px;font-family:'Orbitron',sans-serif;
   font-size:.75rem;color:var(--gold);}
-input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:4px;
-  border-radius:4px;background:var(--t3);outline:none;cursor:none;}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;
-  border-radius:50%;background:var(--foam);box-shadow:0 0 10px var(--foam);cursor:none;
-  border:2px solid var(--ice);}
-input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;
-  background:var(--foam);box-shadow:0 0 10px var(--foam);cursor:none;border:2px solid var(--ice);}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:3px;
+  border-radius:4px;background:linear-gradient(90deg, var(--foam), var(--t3));outline:none;cursor:none;}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, var(--ice), var(--foam));
+  box-shadow:0 0 0 3px rgba(91,184,212,0.15), 0 0 16px rgba(91,184,212,0.5);
+  cursor:none;border:2px solid rgba(255,255,255,0.3);}
+input[type=range]::-moz-range-thumb{
+  width:22px;height:22px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, var(--ice), var(--foam));
+  box-shadow:0 0 0 3px rgba(91,184,212,0.15), 0 0 16px rgba(91,184,212,0.5);
+  cursor:none;border:2px solid rgba(255,255,255,0.3);}
 
 /* ══ BUTTONS ══ */
 .btn{display:block;width:100%;padding:13px;border:1px solid var(--foam);
@@ -412,6 +417,33 @@ footer::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;
 .ctitle-icon.gold-icon { border-color: rgba(240,200,68,0.3); }
 .ctitle-icon.gold-icon svg { stroke: var(--gold); }
 
+
+/* Custom rank selector in advanced */
+.rank-select-group { display:flex; gap:4px; flex-wrap:wrap; margin-top:4px; }
+.rank-sel-btn {
+  -webkit-appearance:none; appearance:none;
+  background: rgba(4,21,37,0.8);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: .5rem;
+  letter-spacing: 1px;
+  color: var(--t2);
+  cursor: none;
+  transition: all .2s;
+  flex: 1;
+  text-align: center;
+  min-width: 40px;
+}
+.rank-sel-btn:hover { border-color: var(--foam); color: var(--foam); }
+.rank-sel-btn.active {
+  background: rgba(91,184,212,0.12);
+  border-color: var(--foam);
+  color: var(--ice);
+  box-shadow: 0 0 10px rgba(91,184,212,0.15);
+}
+
 /* UTIL */
 .mt8{margin-top:8px;}
 .mb0{margin-bottom:0!important;}
@@ -461,16 +493,40 @@ footer::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;
 
   <!-- PRIZE SETUP -->
   <div class="card">
-    <div class="card-title"><span class="ctitle-icon gold-icon"><svg viewBox="0 0 24 24"><path d="M6 4h12v7a6 6 0 01-12 0V4z"/><path d="M6 7H3a3 3 0 003 3"/><path d="M18 7h3a3 3 0 01-3 3"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="8" y1="21" x2="16" y2="21"/></svg></span>PRIZE POOL SETUP</div>
-    <div class="inp-row">
+    <div class="card-title"><span class="ctitle-icon gold-icon"><svg viewBox="0 0 24 24"><path d="M6 4h12v7a6 6 0 01-12 0V4z"/><path d="M6 7H3a3 3 0 003 3"/><path d="M18 7h3a3 3 0 01-3 3"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="8" y1="21" x2="16" y2="21"/></svg></span>PRIZE PER PLACEMENT</div>
+    <div class="info-box" style="margin-bottom:12px;">Enter the prize amount for each placement rank in this event. Leave blank if that rank has no prize.</div>
+    <div class="inp-row3" style="margin-bottom:10px;">
       <div class="input-group mb0">
-        <label class="input-label">Total Prize Pool ($)</label>
-        <input class="inp" type="number" id="s-pool" placeholder="e.g. 6000" min="0" oninput="simpleCalc()">
+        <label class="input-label" style="color:var(--gold);">#1 1ST ($)</label>
+        <input class="inp" type="number" id="s-prize-0" placeholder="e.g. 2280" min="0" oninput="simpleCalc()">
       </div>
       <div class="input-group mb0">
-        <label class="input-label">No. of Players (team)</label>
-        <input class="inp" type="number" id="s-players" placeholder="e.g. 3" min="1" max="20" value="3" oninput="simpleCalc()">
+        <label class="input-label">#2 2ND ($)</label>
+        <input class="inp" type="number" id="s-prize-1" placeholder="e.g. 1040" min="0" oninput="simpleCalc()">
       </div>
+      <div class="input-group mb0">
+        <label class="input-label">#3 3RD ($)</label>
+        <input class="inp" type="number" id="s-prize-2" placeholder="e.g. 620" min="0" oninput="simpleCalc()">
+      </div>
+    </div>
+    <div class="inp-row3">
+      <div class="input-group mb0">
+        <label class="input-label">#4 4TH ($)</label>
+        <input class="inp" type="number" id="s-prize-3" placeholder="e.g. 500" min="0" oninput="simpleCalc()">
+      </div>
+      <div class="input-group mb0">
+        <label class="input-label">#5 5-6TH ($)</label>
+        <input class="inp" type="number" id="s-prize-4" placeholder="e.g. 420" min="0" oninput="simpleCalc()">
+      </div>
+      <div class="input-group mb0">
+        <label class="input-label">#6 7-8TH ($)</label>
+        <input class="inp" type="number" id="s-prize-5" placeholder="e.g. 360" min="0" oninput="simpleCalc()">
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="input-group mb0">
+      <label class="input-label">No. of Players (team)</label>
+      <input class="inp" type="number" id="s-players" placeholder="e.g. 3" min="1" max="20" oninput="simpleCalc()">
     </div>
   </div>
 
@@ -480,17 +536,17 @@ footer::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;
     <div class="input-group">
       <label class="input-label">Sponsor Cut — <span id="s-cut-val" style="color:var(--gold)">42%</span></label>
       <div class="range-wrap">
-        <input type="range" id="s-cut" min="0" max="100" value="42" oninput="document.getElementById('s-cut-val').textContent=this.value+'%';simpleCalc()">
+        <input type="range" id="s-cut" min="0" max="100" value="0" oninput="document.getElementById('s-cut-val').textContent=this.value+'%';simpleCalc()">
       </div>
     </div>
     <div class="inp-row">
       <div class="input-group mb0">
         <label class="input-label">Stipend / Month ($)</label>
-        <input class="inp" type="number" id="s-stipend" placeholder="e.g. 150" min="0" value="150" oninput="simpleCalc()">
+        <input class="inp" type="number" id="s-stipend" placeholder="e.g. 150" min="0" placeholder="e.g. 150" oninput="simpleCalc()">
       </div>
       <div class="input-group mb0">
         <label class="input-label">Duration (months)</label>
-        <input class="inp" type="number" id="s-months" placeholder="e.g. 5" min="1" max="24" value="5" oninput="simpleCalc()">
+        <input class="inp" type="number" id="s-months" placeholder="e.g. 5" min="1" max="24" placeholder="e.g. 5" oninput="simpleCalc()">
       </div>
     </div>
   </div>
@@ -521,7 +577,7 @@ footer::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;
       </div>
       <div class="input-group mb0">
         <label class="input-label">No. of Players</label>
-        <input class="inp" type="number" id="a-players" placeholder="3" min="1" max="20" value="3" oninput="advCalc()">
+        <input class="inp" type="number" id="a-players" placeholder="3" min="1" max="20" placeholder="e.g. 3" oninput="advCalc()">
       </div>
     </div>
   </div>
@@ -626,53 +682,74 @@ function fmtSigned(n){
 // ══════════════════════════════════
 // SIMPLE MODE
 // ══════════════════════════════════
-let simplePlacement=0;
 let simpleData={};
 
-const RANKS=[
-  {label:'1ST',emoji:'◈',pct:1.0},
-  {label:'2ND',emoji:'◆',pct:0.457},
-  {label:'3RD',emoji:'◇',pct:0.272},
-  {label:'4TH',emoji:'▸',pct:0.219},
-  {label:'5-6TH',emoji:'▹',pct:0.184},
-  {label:'7-8TH',emoji:'▫',pct:0.158},
+// RANKS now driven by user prize inputs - these are fallback pct labels only
+const RANK_LABELS=[
+  {label:'1ST',  icon:'#1'},
+  {label:'2ND',  icon:'#2'},
+  {label:'3RD',  icon:'#3'},
+  {label:'4TH',  icon:'#4'},
+  {label:'5-6TH',icon:'#5'},
+  {label:'7-8TH',icon:'#6'},
 ];
+// Simple mode prize inputs per rank
+let simplePrizes=[0,0,0,0,0,0];
+let simplePlacement=0;
 
 function buildSimplePlacements(){
-  const pool=parseFloat(document.getElementById('s-pool').value)||0;
-  if(pool<=0){
-    document.getElementById('s-placement-area').innerHTML='<div class="info-box">Enter a prize pool above to see placement options.</div>';
+  // Read prize inputs per rank
+  for(let i=0;i<6;i++){
+    const el=document.getElementById('s-prize-'+i);
+    simplePrizes[i]=el?parseFloat(el.value)||0:0;
+  }
+  const anyPrize=simplePrizes.some(p=>p>0);
+  if(!anyPrize){
+    document.getElementById('s-placement-area').innerHTML='<div class="info-box">Enter at least one prize amount above to see placement options.</div>';
     return;
   }
-  let html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">';
-  RANKS.forEach((r,i)=>{
-    const prize=Math.round(pool*r.pct);
-    html+=`<button class="placement-btn${simplePlacement===i?' active':''}" onclick="simplePlacement=${i};buildSimplePlacements();simpleCalc();" style="-webkit-appearance:none;appearance:none;background:rgba(4,21,37,0.92);border:1px solid rgba(91,184,212,${simplePlacement===i?'0.5':'0.14'});border-radius:8px;padding:10px 6px;cursor:none;text-align:center;transition:all .2s;${simplePlacement===i?'box-shadow:0 0 18px rgba(91,184,212,.25);':''}">
-      <span style="font-family:'Orbitron',sans-serif;font-size:.88rem;font-weight:900;color:${simplePlacement===i?'#a8dff0':'#4a8fa8'};display:block;margin-bottom:2px;">${r.emoji} ${r.label}</span>
-      <span style="font-family:'Share Tech Mono',monospace;font-size:.58rem;color:${simplePlacement===i?'#5bb8d4':'#2a5f78'};">${fmtMoney(prize)}</span>
+  let h='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">';
+  RANK_LABELS.forEach((r,i)=>{
+    const prize=simplePrizes[i];
+    if(prize===0 && i>0) return;
+    const isActive=simplePlacement===i;
+    h+=`<button onclick="simplePlacement=${i};buildSimplePlacements();simpleCalc();"
+      style="-webkit-appearance:none;appearance:none;
+      background:${isActive?'rgba(91,184,212,0.1)':' rgba(4,21,37,0.92)'};
+      border:1px solid rgba(91,184,212,${isActive?'0.55':'0.14'});
+      border-radius:8px;padding:10px 6px;cursor:none;text-align:center;transition:all .2s;
+      ${isActive?'box-shadow:0 0 18px rgba(91,184,212,.2);':''} width:100%;">
+      <span style="font-family:'Orbitron',sans-serif;font-size:.8rem;font-weight:900;
+        color:${isActive?'#a8dff0':'#4a8fa8'};display:block;margin-bottom:3px;">
+        ${r.icon} ${r.label}
+      </span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;
+        color:${isActive?'#5bb8d4':'#2a5f78'};">
+        ${prize>0?fmtMoney(prize):'—'}
+      </span>
     </button>`;
   });
-  html+='</div>';
-  document.getElementById('s-placement-area').innerHTML=html;
+  h+='</div>';
+  document.getElementById('s-placement-area').innerHTML=h;
 }
 
 function simpleCalc(){
   buildSimplePlacements();
-  const pool   =parseFloat(document.getElementById('s-pool').value)||0;
   const players=parseInt(document.getElementById('s-players').value)||1;
   const cut    =parseFloat(document.getElementById('s-cut').value)||0;
   const stipend=parseFloat(document.getElementById('s-stipend').value)||0;
   const months =parseInt(document.getElementById('s-months').value)||1;
 
   const totalStipend=stipend*months;
-  const rank=RANKS[simplePlacement];
-  const prize=pool*rank.pct;
+  const rank=RANK_LABELS[simplePlacement];
+  const prize=simplePrizes[simplePlacement]||0;
+  if(prize===0){renderResults(null);return;}
   const sponsorPrize=prize*(cut/100);
   const sponsorNet=sponsorPrize-totalStipend;
   const teamPrize=prize*(1-cut/100);
   const perPlayer=teamPrize/players+totalStipend/players;
 
-  simpleData={pool,players,cut,stipend,months,totalStipend,rank,prize,sponsorPrize,sponsorNet,teamPrize,perPlayer,mode:'simple'};
+  simpleData={players,cut,stipend,months,totalStipend,rank,prize,sponsorPrize,sponsorNet,teamPrize,perPlayer,mode:'simple'};
   renderResults(simpleData);
 }
 
